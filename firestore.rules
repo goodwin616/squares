@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- Helper Functions ---
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isCurrentUser(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    
+    // Fetch the parent game document to check status or admin rights
+    function getGameData(gameId) {
+      return get(/databases/$(database)/documents/games/$(gameId)).data;
+    }
+
+    // --- Collection Rules ---
+
+    // Collection Group Query for Squares
+    match /{path=**}/squares/{squareId} {
+      allow read: if isSignedIn();
+    }
+
+    // Users: Users can read/write their own profile. 
+    // We allow 'get' to all auth users so they can resolve names if they know the ID.
+    // We DENY 'list' to prevent dumping the entire user database.
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if false; 
+      allow write: if isCurrentUser(userId);
+    }
+
+    // Games
+    match /games/{gameId} {
+      // 1. Read: Public (Anyone can see the game to join)
+      allow read: if true;
+      
+      // 2. Create: Authenticated users only. 
+      // Validation: Must set themselves as admin.
+      allow create: if isSignedIn() 
+                    && request.resource.data.admin_id == request.auth.uid;
+
+      // 3. Update: Only the Admin can update the game (Scores, Config).
+      // Note: The 'start_game' Cloud Function bypasses this (it uses Admin SDK),
+      // so this rule is primarily for the frontend 'saveScores' action.
+      allow update: if isCurrentUser(resource.data.admin_id);
+
+      // 4. Delete: Only the Admin can delete the game, and only if it's in DRAFT.
+      allow delete: if isCurrentUser(resource.data.admin_id)
+                    && resource.data.status == 'DRAFT';
+
+      // --- Squares Subcollection ---
+      match /squares/{squareId} {
+        allow read: if true;
+
+        // 4. Claiming (Create)
+        // - User must be signed in
+        // - Game must be in 'DRAFT' mode
+        // - User must be claiming it for themselves
+        allow create: if isSignedIn()
+                      && getGameData(gameId).status == 'DRAFT'
+                      && request.resource.data.owner_id == request.auth.uid;
+
+        // 5. Releasing (Delete)
+        // - User must own the square AND Game must be in 'DRAFT' mode
+        allow delete: if isSignedIn() && (
+                        (getGameData(gameId).status == 'DRAFT' && resource.data.owner_id == request.auth.uid)
+                      );
+
+        // 6. Managing (Update)
+        // - Only the Game Admin can update a square (e.g., toggling 'is_paid')
+        allow update: if isSignedIn()
+                      && getGameData(gameId).admin_id == request.auth.uid;
+      }
+    }
+  }
+}

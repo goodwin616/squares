@@ -6,6 +6,7 @@ import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
+import { getAnalytics } from 'firebase/analytics';
 
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
@@ -13,6 +14,9 @@ import { environment } from '../environments/environment';
 const app = initializeApp(environment.firebase);
 
 if (typeof window !== 'undefined') {
+  // Initialize Analytics
+  getAnalytics(app);
+
   if (!environment.production) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;

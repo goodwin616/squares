@@ -1,0 +1,85 @@
+<div class="grid-scroll-wrapper" *ngIf="usersMap$ | async as usersMap">
+  <div class="game-grid">
+    
+    <!-- Top Left Corner (Legend) -->
+    <div class="cell legend sticky-corner">
+      @if (game?.status !== 'DRAFT') {
+        <button mat-icon-button (click)="toggleSort()" [color]="isSorted ? 'primary' : ''" title="Sort by Numbers">
+          <span style="font-size: 1.5rem;">🏈</span>
+        </button>
+      } @else {
+      }
+    </div>
+
+    <!-- Top Headers (Cols) - Home Team -->
+    <div class="header-team-top sticky-top" 
+         [style.backgroundColor]="game?.config?.teams?.homeColor || '#f5f5f5'"
+         [style.color]="game?.config?.teams?.homeColor ? '#ffffff' : 'inherit'">
+      <div class="team-container">
+        <span class="team-name">{{ game?.config?.teams?.home || 'Home' }}</span>
+      </div>
+    </div>
+
+    <!-- Left Headers (Rows) - Away Team -->
+    <div class="header-team-left sticky-left"
+         [style.backgroundColor]="game?.config?.teams?.awayColor || '#f5f5f5'"
+         [style.color]="game?.config?.teams?.awayColor ? '#ffffff' : 'inherit'">
+      <div class="team-container vertical">
+        <span class="team-name">{{ game?.config?.teams?.away || 'Away' }}</span>
+      </div>
+    </div>
+
+    <!-- Grid Header Row (Numbers) -->
+    <ng-container *ngFor="let c of displayCols">
+      <div class="cell header-col sticky-top">
+        <span class="header-number">{{ getHeaderNumber(c, 'col') }}</span>
+      </div>
+    </ng-container>
+
+    <!-- Rows -->
+    <ng-container *ngFor="let r of displayRows">
+      <!-- Left Header (Row Number) -->
+      <div class="cell header-row sticky-left">
+        <span class="header-number">{{ getHeaderNumber(r, 'row') }}</span>
+      </div>
+
+      <!-- Cells -->
+      <ng-container *ngFor="let c of displayCols">
+        <div class="cell square"
+             [ngClass]="{
+               'taken': !!getSquare(r, c),
+               'my-square': currentUser && getSquare(r, c)?.owner_id === currentUser.uid,
+               'winner': isWinner(r, c)
+             }"
+             (click)="onSquareClick(r, c)">
+          
+          <!-- Winner Indicators -->
+          <div class="winner-indicators">
+            @for (p of getPrizes(r, c); track p) {
+              <mat-icon class="winner-icon" [style.color]="getPeriodColor(p)">check_circle</mat-icon>
+            }
+          </div>
+
+          <!-- Taken State -->
+          @if (getSquare(r, c); as sq) {
+            <div class="square-content">
+              <span class="owner-name">{{ getOwnerName(sq, usersMap) | gridName:uniqueNames }}</span>
+              <span *ngIf="game?.config?.rules?.track_payments && !sq.is_paid && sq.owner_id !== game.admin_id && currentUser?.uid === game.admin_id" class="unpaid-badge" title="Payment Pending">$</span>
+            </div>
+          } @else if (game?.status !== 'DRAFT' && isWinner(r, c)) {
+            <!-- House Winner State -->
+            <div class="square-content">
+              <span class="owner-name house">HOUSE</span>
+            </div>
+          } @else if (game?.status === 'DRAFT') {
+            <!-- Empty State -->
+            <div class="empty-hint">
+              <span>+</span>
+            </div>
+          }
+        </div>
+      </ng-container>
+    </ng-container>
+
+  </div>
+</div>

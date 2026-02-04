@@ -1,0 +1,99 @@
+<div class="dashboard-container">
+  @let user = user$ | async;
+  @let vm = vm$ | async;
+
+  <header>
+    <h1>My Games</h1>
+    @if (user) {
+      <button mat-raised-button color="primary" routerLink="/create">
+        <mat-icon>add</mat-icon>
+        Create New Game
+      </button>
+    }
+  </header>
+
+  @if (user === undefined || (user && !vm)) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+  } @else if (user && vm) {
+    <section class="game-section">
+      @if (vm.owned.length > 0) {
+        <div class="games-list">
+          <div class="grid">
+            @for (game of vm.owned; track game.id) {
+              <mat-card [routerLink]="['/game', game.id]" class="game-card">
+                <mat-card-header>
+                  <mat-card-title>{{ game.name }}</mat-card-title>
+                  <mat-card-subtitle
+                    >{{ game.config?.teams?.away }} @
+                    {{ game.config?.teams?.home }}</mat-card-subtitle
+                  >
+                </mat-card-header>
+                <mat-card-content>
+                  <p>
+                    <span class="status-badge" [class]="game.status">{{ game.status }}</span>
+                    <span class="status-badge ADMIN">ADMIN</span>
+                  </p>
+                  <p>
+                    Price per square:
+                    {{ game.config?.price | currency: 'USD' : 'symbol' : '1.2-2' }}
+                  </p>
+                </mat-card-content>
+                <mat-card-actions align="end">
+                  @if (game.status === 'DRAFT') {
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="deleteGame($event, game)"
+                      title="Delete Game"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  }
+                </mat-card-actions>
+              </mat-card>
+            }
+          </div>
+        </div>
+      }
+
+      @if (vm.joined.length > 0) {
+        <div class="games-list">
+          <h2>Games I'm In</h2>
+          <div class="grid">
+            @for (game of vm.joined; track game.id) {
+              <mat-card [routerLink]="['/game', game.id]" class="game-card">
+                <mat-card-header>
+                  <mat-card-title>{{ game.name }}</mat-card-title>
+                  <mat-card-subtitle
+                    >{{ game.config?.teams?.away }} @
+                    {{ game.config?.teams?.home }}</mat-card-subtitle
+                  >
+                </mat-card-header>
+                <mat-card-content>
+                  <p>
+                    <span class="status-badge" [class]="game.status">{{ game.status }}</span>
+                  </p>
+                  <p>
+                    Price per square:
+                    {{ game.config?.price | currency: 'USD' : 'symbol' : '1.2-2' }}
+                  </p>
+                </mat-card-content>
+              </mat-card>
+            }
+          </div>
+        </div>
+      }
+
+      @if (vm.owned.length === 0 && vm.joined.length === 0) {
+        <p>You haven't joined any games yet.</p>
+      }
+    </section>
+  } @else {
+    <div class="login-prompt">
+      <p>Please log in to see your games.</p>
+      <button mat-raised-button (click)="login()">Login with Google</button>
+    </div>
+  }
+</div>

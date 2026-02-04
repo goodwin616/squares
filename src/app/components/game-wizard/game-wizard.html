@@ -1,0 +1,173 @@
+<div class="container">
+  <h1>Create a new game</h1>
+
+  <mat-stepper [linear]="true" #stepper labelPosition="bottom">
+    <mat-step [stepControl]="gameForm">
+      <form [formGroup]="gameForm">
+        <ng-template matStepLabel>Game Details</ng-template>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Game Name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. Super Bowl LV Bash" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Price per Square ($)</mat-label>
+          <input matInput type="number" formControlName="price" />
+        </mat-form-field>
+
+        <div formGroupName="rules">
+          <mat-form-field appearance="fill">
+            <mat-label>Max Squares per Player (Optional)</mat-label>
+            <input matInput type="number" formControlName="max_squares" placeholder="Unlimited" />
+            <mat-hint>Leave empty for no limit</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Venmo Username (Optional)</mat-label>
+            <input matInput formControlName="venmoUsername" placeholder="e.g. your_username" />
+            <mat-hint>Streamline collections by letting users pay directly with Venmo.</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="gameForm.get('payouts')!">
+      <form [formGroup]="gameForm">
+        <ng-template matStepLabel>Payouts (%)</ng-template>
+
+        <div formGroupName="payouts">
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Payout Split</mat-label>
+            <mat-select formControlName="splitType" (selectionChange)="updatePayouts($event.value)">
+              <mat-option *ngFor="let option of payoutOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>1st Quarter</mat-label>
+            <input matInput type="number" formControlName="q1" (input)="onManualPayoutChange()" />
+            <span matTextSuffix>%</span>
+            <mat-hint
+              >Payout:
+              {{ (totalPot * (gameForm.get('payouts.q1')?.value || 0)) / 100 | currency }}</mat-hint
+            >
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Halftime</mat-label>
+            <input matInput type="number" formControlName="half" (input)="onManualPayoutChange()" />
+            <span matTextSuffix>%</span>
+            <mat-hint
+              >Payout:
+              {{
+                (totalPot * (gameForm.get('payouts.half')?.value || 0)) / 100 | currency
+              }}</mat-hint
+            >
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>3rd Quarter</mat-label>
+            <input matInput type="number" formControlName="q3" (input)="onManualPayoutChange()" />
+            <span matTextSuffix>%</span>
+            <mat-hint
+              >Payout:
+              {{ (totalPot * (gameForm.get('payouts.q3')?.value || 0)) / 100 | currency }}</mat-hint
+            >
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Final</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="final"
+              (input)="onManualPayoutChange()"
+            />
+            <span matTextSuffix>%</span>
+            <mat-hint
+              >Payout:
+              {{
+                (totalPot * (gameForm.get('payouts.final')?.value || 0)) / 100 | currency
+              }}</mat-hint
+            >
+          </mat-form-field>
+
+          @if (gameForm.get('payouts')?.errors?.['sumNot100']) {
+            <mat-error class="payout-error">
+              <mat-icon>error</mat-icon>
+              Total percentage must be 100% (currently {{ payoutSum }}%)
+            </mat-error>
+          }
+        </div>
+
+        <div>
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-button matStepperNext [disabled]="gameForm.get('payouts')?.invalid">
+            Next
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>Review</ng-template>
+      <p>You are about to create a game.</p>
+      <div class="summary-section">
+        <p>
+          Name: <strong>{{ gameForm.value.name }}</strong>
+        </p>
+        <p>
+          Price per Square: <strong>{{ gameForm.value.price | currency }}</strong>
+        </p>
+        <p>
+          Total Pot: <strong>{{ totalPot | currency }}</strong>
+        </p>
+        <p>
+          Max Squares/Player:
+          <strong>{{ gameForm.value.rules?.max_squares || 'Unlimited' }}</strong>
+        </p>
+      </div>
+
+      <div class="payouts-summary">
+        <h4>Pot Split</h4>
+        <div class="payout-item">
+          <span>1st Quarter ({{ gameForm.value.payouts?.q1 }}%):</span>
+          <strong>{{ (totalPot * (gameForm.value.payouts?.q1 || 0)) / 100 | currency }}</strong>
+        </div>
+        <div class="payout-item">
+          <span>Halftime ({{ gameForm.value.payouts?.half }}%):</span>
+          <strong>{{ (totalPot * (gameForm.value.payouts?.half || 0)) / 100 | currency }}</strong>
+        </div>
+        <div class="payout-item">
+          <span>3rd Quarter ({{ gameForm.value.payouts?.q3 }}%):</span>
+          <strong>{{ (totalPot * (gameForm.value.payouts?.q3 || 0)) / 100 | currency }}</strong>
+        </div>
+        <div class="payout-item">
+          <span>Final ({{ gameForm.value.payouts?.final }}%):</span>
+          <strong>{{ (totalPot * (gameForm.value.payouts?.final || 0)) / 100 | currency }}</strong>
+        </div>
+      </div>
+
+      @let user = user$ | async;
+      @if (user === null) {
+        <div style="margin-top: 1rem; color: #f44336">
+          <p>You need to sign in to create a game.</p>
+        </div>
+      }
+
+      <div style="margin-top: 2rem">
+        <button mat-button matStepperPrevious>Back</button>
+        @if (user) {
+          <button mat-raised-button color="primary" (click)="createGame()">Create Game</button>
+        }
+      </div>
+    </mat-step>
+  </mat-stepper>
+</div>

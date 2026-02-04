@@ -1,0 +1,27 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <span routerLink="/" style="cursor: pointer">{{ title() }}</span>
+  <span class="spacer"></span>
+
+  @let user = user$ | async;
+  @if (user === undefined) {
+    <mat-spinner diameter="24" color="accent"></mat-spinner>
+  } @else if (user) {
+    <button mat-button routerLink="/">Dashboard</button>
+
+    <button mat-icon-button [title]="user.displayName" class="user-profile">
+      @if (user.photoURL) {
+        <img [src]="user.photoURL" alt="Profile" class="profile-pic" />
+      } @else {
+        <mat-icon>account_circle</mat-icon>
+      }
+    </button>
+
+    <button mat-button (click)="logout()">Logout</button>
+  } @else {
+    <button mat-button (click)="login()">Login with Google</button>
+  }
+</mat-toolbar>
+
+<main class="content-container">
+  <router-outlet></router-outlet>
+</main>

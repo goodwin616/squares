@@ -1,0 +1,91 @@
+.dashboard-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+
+    h1 {
+      margin: 0;
+      font-weight: 700;
+    }
+  }
+
+  .game-section {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .games-list {
+    h2 {
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .game-card {
+    cursor: pointer;
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--mat-sys-elevation-level3);
+    }
+
+    mat-card-header {
+      margin-bottom: 16px;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: white;
+      display: inline-block;
+
+      &.DRAFT {
+        background-color: #4caf50;
+      }
+      &.LOCKED,
+      &.ACTIVE {
+        background-color: #ff9800;
+      }
+      &.COMPLETED {
+        background-color: #2196f3;
+      }
+      &.ADMIN {
+        background-color: #d32f2f;
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .login-prompt {
+    text-align: center;
+    padding: 64px;
+    background: var(--mat-sys-surface-container-low);
+    border-radius: 16px;
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 64px;
+  }
+}

@@ -375,9 +375,17 @@ export class GameDetailComponent {
     }
   }
 
+  get isMobile(): boolean {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
   getVenmoLink(username: string, amount: number, payerName: string): string {
-    const note = `Squares - ${payerName}`;
+    const note = `🏈 Squares - ${payerName}`;
     const txn = 'pay';
+
+    if (this.isMobile) {
+      return `venmo://paycharge?txn=${txn}&recipients=${username}&amount=${amount}&note=${encodeURIComponent(note)}`;
+    }
     return `https://account.venmo.com/payment-link?amount=${amount}&note=${encodeURIComponent(note)}&recipients=${username}&txn=${txn}`;
   }
 

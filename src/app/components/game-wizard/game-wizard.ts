@@ -132,6 +132,17 @@ export class GameWizardComponent implements OnInit {
     const currentYear = new Date().getFullYear();
     const game = GAMES_SCHEDULE.find((g) => new Date(g.date).getFullYear() === currentYear);
 
+    if (game) {
+      this.gameForm.patchValue({
+        teams: {
+          home: game.homeTeam,
+          homeColor: game.homeColor || '#333333',
+          away: game.awayTeam,
+          awayColor: game.awayColor || '#333333',
+        },
+      });
+    }
+
     this.authService.user$.subscribe((user) => {
       if (user && game) {
         const firstName = user.displayName?.split(' ')[0] || 'My';
@@ -142,15 +153,6 @@ export class GameWizardComponent implements OnInit {
             name: suggestedName,
           });
         }
-
-        this.gameForm.patchValue({
-          teams: {
-            home: game.homeTeam,
-            homeColor: game.homeColor || '#333333',
-            away: game.awayTeam,
-            awayColor: game.awayColor || '#333333',
-          },
-        });
       }
     });
   }
@@ -192,6 +194,7 @@ export class GameWizardComponent implements OnInit {
           price: formValue.price,
           payouts: payoutsData,
           rules: formValue.rules,
+          teams: formValue.teams,
         },
         scores: {
           q1: { home: null, away: null },

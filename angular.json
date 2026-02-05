@@ -31,45 +31,33 @@
               },
               "src/assets"
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
-            "polyfills": [
-              "zone.js"
-            ]
+            "styles": ["src/styles.scss"],
+            "polyfills": ["zone.js"]
           },
-                      "configurations": {
-                      "production": {
-                        "fileReplacements": [
-                          {
-                            "replace": "src/environments/environment.ts",
-                            "with": "src/environments/environment.prod.ts"
-                          }
-                        ],
-                        "budgets": [
-                          {
-                            "type": "initial",
-                            "maximumWarning": "2MB",
-                            "maximumError": "4MB"
-                          },
-                          {
-                            "type": "anyComponentStyle",
-                            "maximumWarning": "4kB",
-                            "maximumError": "8kB"
-                          }
-                        ],
-                        "outputHashing": "all"
-                      },
-                      "staging": {
-                        "fileReplacements": [
-                          {
-                            "replace": "src/environments/environment.ts",
-                            "with": "src/environments/environment.staging.ts"
-                          }
-                        ],
-                        "outputHashing": "all"
-                      },
-                      "development": {              "optimization": false,
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2MB",
+                  "maximumError": "4MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
             }

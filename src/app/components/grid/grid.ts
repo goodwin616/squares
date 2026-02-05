@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Observable, BehaviorSubject, switchMap, map, of, shareReplay, combineLatest } from 'rxjs';
 import { User } from 'firebase/auth';
 
@@ -19,6 +20,7 @@ import { User } from 'firebase/auth';
     MatIconModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule,
     GridNamePipe,
   ],
   templateUrl: './grid.html',
@@ -42,6 +44,10 @@ export class GridComponent implements OnChanges {
   cols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   isSorted = false;
+  isSaving = false;
+  showSaved = false;
+  private saveTimeout: number | null = null;
+  private activeSaves = 0;
 
   usersMap$: Observable<Map<string, UserProfile>> = combineLatest([
     this.squares$,
@@ -190,7 +196,12 @@ export class GridComponent implements OnChanges {
         }
       }
 
-      await this.gameService.claimSquare(this.game.id, id, this.currentUser);
+      this.startSaving();
+      try {
+        await this.gameService.claimSquare(this.game.id, id, this.currentUser);
+      } finally {
+        this.stopSaving();
+      }
     } else if (sq.owner_id === this.currentUser?.uid) {
       // Release check: prevent if marked as paid
       if (sq.is_paid) {
@@ -205,7 +216,31 @@ export class GridComponent implements OnChanges {
         );
         return;
       }
-      await this.gameService.releaseSquare(this.game!.id, id);
+      this.startSaving();
+      try {
+        await this.gameService.releaseSquare(this.game!.id, id);
+      } finally {
+        this.stopSaving();
+      }
+    }
+  }
+
+  private startSaving() {
+    this.activeSaves++;
+    this.isSaving = true;
+    this.showSaved = false;
+    if (this.saveTimeout) clearTimeout(this.saveTimeout);
+  }
+
+  private stopSaving() {
+    this.activeSaves--;
+    if (this.activeSaves <= 0) {
+      this.activeSaves = 0;
+      this.isSaving = false;
+      this.showSaved = true;
+      this.saveTimeout = setTimeout(() => {
+        this.showSaved = false;
+      }, 3000);
     }
   }
 }

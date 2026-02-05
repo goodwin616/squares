@@ -8,6 +8,16 @@
           <span style="font-size: 1.5rem;">🏈</span>
         </button>
       } @else {
+        <!-- Save Status Indicator -->
+        <div class="save-status" [class.visible]="showSaved || isSaving">
+          @if (isSaving) {
+            <mat-spinner diameter="16"></mat-spinner>
+            <span class="status-text">Saving...</span>
+          } @else {
+            <mat-icon>cloud_done</mat-icon>
+            <span class="status-text">Saved</span>
+          }
+        </div>
       }
     </div>
 

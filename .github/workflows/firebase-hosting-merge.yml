@@ -14,12 +14,19 @@ jobs:
       - name: Create environment file
         run: |
           mkdir -p src/environments
-          echo "${{ secrets.ENVIRONMENT_STAGING }}" > src/environments/environment.staging.ts
-          echo "${{ secrets.ENVIRONMENT_STAGING }}" > src/environments/environment.ts
+          if [ -z "${{ secrets.ENVIRONMENT_PROD }}" ]; then
+            echo "export const environment = { production: true, firebase: {} };" > src/environments/environment.prod.ts
+            echo "export const environment = { production: false, firebase: {} };" > src/environments/environment.ts
+          else
+            echo "${{ secrets.ENVIRONMENT_PROD }}" > src/environments/environment.prod.ts
+            echo "${{ secrets.ENVIRONMENT_PROD }}" > src/environments/environment.ts
+          fi
+          # Also create staging file to satisfy Angular build validation
+          echo "export const environment = { production: true, firebase: {} };" > src/environments/environment.staging.ts
       - run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GOODWIN_SQUARES_STAGING }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GOODWIN_SQUARES_PROD }}
           channelId: live
-          projectId: goodwin-squares-staging
+          projectId: goodwin-squares-prod

@@ -13,9 +13,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Create environment file
+        run: |
+          mkdir -p src/environments
+          if [ -z "${{ secrets.ENVIRONMENT_STAGING }}" ]; then
+            echo "export const environment = { production: true, firebase: {} };" > src/environments/environment.prod.ts
+            echo "export const environment = { production: false, firebase: {} };" > src/environments/environment.ts
+            echo "export const environment = { production: true, firebase: {} };" > src/environments/environment.staging.ts
+          else
+            echo "${{ secrets.ENVIRONMENT_STAGING }}" > src/environments/environment.staging.ts
+            echo "${{ secrets.ENVIRONMENT_STAGING }}" > src/environments/environment.ts
+            echo "${{ secrets.ENVIRONMENT_STAGING }}" > src/environments/environment.prod.ts
+          fi
       - run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GOODWIN_SQUARES_STAGING }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
           projectId: goodwin-squares-staging

@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "goodwin-squares-prod"
+    "default": "goodwin-squares-prod",
+    "staging": "goodwin-squares-staging"
   }
 }

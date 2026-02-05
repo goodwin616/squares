@@ -14,12 +14,12 @@ jobs:
       - name: Create environment file
         run: |
           mkdir -p src/environments
-          echo "${{ secrets.ENVIRONMENT_PROD }}" > src/environments/environment.prod.ts
-          echo "${{ secrets.ENVIRONMENT_PROD }}" > src/environments/environment.ts
+          echo "${{ secrets.ENVIRONMENT_STAGING }}" > src/environments/environment.staging.ts
+          echo "${{ secrets.ENVIRONMENT_STAGING }}" > src/environments/environment.ts
       - run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GOODWIN_SQUARES_PROD }}
-          channelId: preview
-          projectId: goodwin-squares-prod
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GOODWIN_SQUARES_STAGING }}
+          channelId: live
+          projectId: goodwin-squares-staging

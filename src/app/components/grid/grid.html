@@ -3,22 +3,33 @@
     
     <!-- Top Left Corner (Legend) -->
     <div class="cell legend sticky-corner">
-      @if (game?.status !== 'DRAFT') {
-        <button mat-icon-button (click)="toggleSort()" [color]="isSorted ? 'primary' : ''" title="Sort by Numbers">
-          <span style="font-size: 1.5rem;">🏈</span>
-        </button>
-      } @else {
-        <!-- Save Status Indicator -->
-        <div class="save-status" [class.visible]="showSaved || isSaving">
-          @if (isSaving) {
-            <mat-spinner diameter="16"></mat-spinner>
-            <span class="status-text">Saving...</span>
+      <div [class.legend-sections]="game?.status === 'DRAFT'" class="legend-container">
+        <div class="legend-actions">
+          @if (game?.status !== 'DRAFT') {
+            <button mat-icon-button (click)="toggleSort()" [color]="isSorted ? 'primary' : ''" title="Sort by Numbers">
+              <span style="font-size: 1.5rem;">🏈</span>
+            </button>
           } @else {
-            <mat-icon>cloud_done</mat-icon>
-            <span class="status-text">Saved</span>
+            <button mat-icon-button (click)="claimRandomSquare()" title="Claim Random Square" [disabled]="isSaving" class="random-btn">
+              <mat-icon>casino</mat-icon>
+            </button>
           }
         </div>
-      }
+        
+        @if (game?.status === 'DRAFT') {
+          <div class="legend-status">
+            <div class="save-status visible">
+              @if (isSaving) {
+                <mat-spinner diameter="12"></mat-spinner>
+                <span class="status-text">Saving...</span>
+              } @else {
+                <mat-icon>cloud_done</mat-icon>
+                <span class="status-text">Synced</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- Top Headers (Cols) - Home Team -->

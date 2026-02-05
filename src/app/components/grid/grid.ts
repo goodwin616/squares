@@ -45,8 +45,6 @@ export class GridComponent implements OnChanges {
 
   isSorted = false;
   isSaving = false;
-  showSaved = false;
-  private saveTimeout: number | null = null;
   private activeSaves = 0;
 
   usersMap$: Observable<Map<string, UserProfile>> = combineLatest([
@@ -225,11 +223,61 @@ export class GridComponent implements OnChanges {
     }
   }
 
+  async claimRandomSquare() {
+    if (this.game?.status !== 'DRAFT') return;
+    if (!this.currentUser) {
+      await this.authService.login();
+      return;
+    }
+
+    // Find available IDs (0-99)
+    const availableIds: number[] = [];
+    for (let i = 0; i < 100; i++) {
+      if (!this.squaresMap.has(i)) {
+        availableIds.push(i);
+      }
+    }
+
+    if (availableIds.length === 0) {
+      this.snackBar.open('No squares left!', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Max Squares Check
+    const maxSquares = this.game.config?.rules?.max_squares;
+    const currentUser = this.currentUser;
+    if (maxSquares && maxSquares > 0 && currentUser) {
+      const mySquareCount = this.squares.filter((s) => s.owner_id === currentUser.uid).length;
+      if (mySquareCount >= maxSquares) {
+        this.snackBar.open(
+          `You have reached the maximum limit of ${maxSquares} squares per player.`,
+          'Close',
+          {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+        );
+        return;
+      }
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableIds.length);
+    const randomId = availableIds[randomIndex];
+
+    if (randomId === undefined || !this.game) return;
+
+    this.startSaving();
+    try {
+      await this.gameService.claimSquare(this.game.id, randomId, currentUser);
+    } finally {
+      this.stopSaving();
+    }
+  }
+
   private startSaving() {
     this.activeSaves++;
     this.isSaving = true;
-    this.showSaved = false;
-    if (this.saveTimeout) clearTimeout(this.saveTimeout);
   }
 
   private stopSaving() {
@@ -237,10 +285,6 @@ export class GridComponent implements OnChanges {
     if (this.activeSaves <= 0) {
       this.activeSaves = 0;
       this.isSaving = false;
-      this.showSaved = true;
-      this.saveTimeout = setTimeout(() => {
-        this.showSaved = false;
-      }, 3000);
     }
   }
 }

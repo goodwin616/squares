@@ -8,29 +8,62 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.legend-container {
+  width: 100%;
+  height: 100%;
+}
+
+.legend-sections {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+
+  .legend-actions {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+}
+
+.legend-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.legend-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.02);
+  width: 100%;
+  height: 100%;
+}
+
 .save-status {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  font-size: 0.65rem;
+  gap: 1px;
+  font-size: 0.55rem;
   font-weight: 500;
   color: #2e7d32;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.3s;
-  width: 100%;
-  height: 100%;
 
   &.visible {
     opacity: 1;
   }
 
   mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+  }
+
+  mat-spinner {
+    margin-bottom: 1px;
   }
 
   .status-text {

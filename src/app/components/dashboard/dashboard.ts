@@ -32,6 +32,13 @@ export class DashboardComponent {
 
   user$ = this.authService.user$;
 
+  isSuperAdmin$: Observable<boolean> = this.user$.pipe(
+    switchMap((user) => {
+      if (!user) return of(false);
+      return this.gameService.isSuperAdmin(user.uid);
+    }),
+  );
+
   vm$: Observable<{ owned: unknown[]; joined: unknown[] } | undefined> = this.user$.pipe(
     switchMap((user) => {
       if (user === undefined) return of(undefined);

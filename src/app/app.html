@@ -6,6 +6,12 @@
   @if (user === undefined) {
     <mat-spinner diameter="24" color="accent"></mat-spinner>
   } @else if (user) {
+    @if (isSuperAdmin$ | async) {
+      <button mat-button color="accent" routerLink="/admin/super">
+        <mat-icon>security</mat-icon>
+        Super Admin
+      </button>
+    }
     <button mat-button routerLink="/">Dashboard</button>
 
     <button mat-icon-button [title]="user.displayName" class="user-profile">

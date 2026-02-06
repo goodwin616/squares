@@ -5,10 +5,12 @@
   <header>
     <h1>My Games</h1>
     @if (user) {
-      <button mat-raised-button color="primary" routerLink="/create">
-        <mat-icon>add</mat-icon>
-        Create New Game
-      </button>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" routerLink="/create">
+          <mat-icon>add</mat-icon>
+          Create New Game
+        </button>
+      </div>
     }
   </header>
 

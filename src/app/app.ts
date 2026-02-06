@@ -6,6 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from './services/auth';
+import { GameService } from './services/game';
+import { switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -24,9 +26,17 @@ import { AuthService } from './services/auth';
 })
 export class App {
   private authService = inject(AuthService);
+  private gameService = inject(GameService);
   protected readonly title = signal('Squares');
 
   user$ = this.authService.user$;
+
+  isSuperAdmin$ = this.user$.pipe(
+    switchMap((user) => {
+      if (!user) return of(false);
+      return this.gameService.isSuperAdmin(user.uid);
+    }),
+  );
 
   login() {
     this.authService.login();

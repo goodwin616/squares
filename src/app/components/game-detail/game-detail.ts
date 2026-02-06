@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { switchMap, map, combineLatest, of, tap, firstValueFrom, Observable } from 'rxjs';
+import { switchMap, map, combineLatest, of, tap, firstValueFrom, Observable, startWith } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -86,6 +86,7 @@ export class GameDetailComponent {
         this.scoreInputs = JSON.parse(JSON.stringify(game.scores));
       }
     }),
+    startWith(undefined),
   );
 
   squares$ = this.gameId$.pipe(

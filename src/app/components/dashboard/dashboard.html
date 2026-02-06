@@ -2,17 +2,17 @@
   @let user = user$ | async;
   @let vm = vm$ | async;
 
-  <header>
-    <h1>My Games</h1>
-    @if (user) {
+  @if (user) {
+    <header>
+      <h1>My Games</h1>
       <div class="header-actions">
         <button mat-raised-button color="primary" routerLink="/create">
           <mat-icon>add</mat-icon>
           Create New Game
         </button>
       </div>
-    }
-  </header>
+    </header>
+  }
 
   @if (user === undefined || (user && !vm)) {
     <div class="loading-container">
@@ -89,13 +89,74 @@
       }
 
       @if (vm.owned.length === 0 && vm.joined.length === 0) {
-        <p>You haven't joined any games yet.</p>
+        <div class="empty-state">
+          <mat-icon class="empty-icon">sports_football</mat-icon>
+          <h2>No games found</h2>
+          <p>You haven't joined or created any games yet. Start the fun by creating your own!</p>
+          <button mat-raised-button color="primary" routerLink="/create">
+            <mat-icon>add</mat-icon>
+            Create My First Game
+          </button>
+        </div>
       }
     </section>
   } @else {
-    <div class="login-prompt">
-      <p>Please log in to see your games.</p>
-      <button mat-raised-button (click)="login()">Login with Google</button>
+    <div class="welcome-section">
+      <div class="welcome-content">
+        <header class="hero">
+          <h1>The Ultimate Squares App</h1>
+          <p class="subtitle">
+            Host, manage, and track your pool in real-time. Setup takes less than 60 seconds.
+          </p>
+          <br />
+          <p class="subtitle">No ads. No fees. Just squares.</p>
+        </header>
+
+        <div class="info-box">
+          <h2>New to Squares?</h2>
+          <p>
+            You get a 10x10 grid, pick your squares, and we assign random numbers to the rows and
+            columns. If the game score's last digits match your square at the end of a quarter,
+            <strong>you win the pot</strong>. No football knowledge required—just luck!
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature">
+            <mat-icon color="primary" class="large-icon">bolt</mat-icon>
+            <h3>Instant Setup</h3>
+            <p>
+              Forget drawing grids on poster board. Create a game, set your price, and share the
+              link instantly. We handle the rest.
+            </p>
+          </div>
+          <div class="feature">
+            <mat-icon color="primary" class="large-icon">sync</mat-icon>
+            <h3>Live Syncing</h3>
+            <p>
+              Scores and winning squares update automatically in real-time. Everyone sees the same
+              board on their own phone or device.
+            </p>
+          </div>
+          <div class="feature">
+            <mat-icon color="primary" class="large-icon">payments</mat-icon>
+            <h3>Easy game management</h3>
+            <p>
+              Track who has paid and who hasn't. Includes Venmo integration to make collecting the
+              pot effortless.
+            </p>
+          </div>
+        </div>
+
+        <div class="cta-box">
+          <h2>Ready to play?</h2>
+          <p>Join for free and get your grid running before kickoff.</p>
+          <button mat-raised-button color="primary" class="cta-button" (click)="login()">
+            <mat-icon>login</mat-icon>
+            Sign in with Google to Start
+          </button>
+        </div>
+      </div>
     </div>
   }
 </div>

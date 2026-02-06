@@ -2,11 +2,19 @@
   padding: 24px;
   max-width: 800px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; // Ensure no children cause horizontal scroll
+
+  @media (max-width: 600px) {
+    padding: 16px 8px;
+  }
 }
 
 mat-form-field {
   width: 100%;
   margin-bottom: 16px;
+  box-sizing: border-box;
 }
 
 .full-width {
@@ -20,6 +28,134 @@ mat-form-field {
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+}
+
+.payout-visualizer {
+  display: flex;
+  gap: 8px;
+  margin: 24px 0 32px;
+  height: 120px;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  .payout-card {
+    border-radius: 12px;
+    padding: 12px 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    min-width: 0; 
+    flex: 1 1 0%; // Encourage equal sharing/shrinking
+    box-shadow: var(--mat-sys-elevation-level1);
+    box-sizing: border-box;
+
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: var(--mat-sys-elevation-level2);
+    }
+
+    .period {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      opacity: 0.9;
+      margin-bottom: 4px;
+      white-space: nowrap;
+    }
+
+    .amount {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .percent {
+      font-size: 0.8rem;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    &.q1 { background: linear-gradient(135deg, #2196f3, #1565c0); }
+    &.half { background: linear-gradient(135deg, #4caf50, #2e7d32); }
+    &.q3 { background: linear-gradient(135deg, #ff9800, #ef6c00); }
+    &.final { background: linear-gradient(135deg, #e91e63, #c2185b); }
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    height: auto;
+    min-height: 300px;
+    gap: 8px;
+
+    .payout-card {
+      width: 100%;
+      flex-direction: row;
+      justify-content: flex-start;
+      padding: 12px 20px;
+      height: 60px; 
+      min-height: 50px;
+      gap: 12px;
+
+      .period {
+        margin-bottom: 0;
+        width: 50px;
+        text-align: left;
+        flex-shrink: 0;
+      }
+
+      .amount {
+        margin-bottom: 0;
+        text-align: right;
+        width: auto;
+        flex: 1;
+      }
+
+      .percent {
+        width: 40px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+.custom-payouts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+  animation: fadeIn 0.3s ease-out;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
 }
 
 .summary-section {

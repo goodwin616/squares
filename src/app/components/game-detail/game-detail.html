@@ -231,10 +231,16 @@
               </mat-select>
             </mat-form-field>
 
-            <button mat-raised-button color="accent" (click)="startGame(game.id)" style="width: 100%">
-              START GAME (LOCK & RANDOMIZE)
-            </button>
-          </div>
+                      <button 
+                        mat-raised-button 
+                        color="accent" 
+                        (click)="startGame(game.id)" 
+                        style="width: 100%"
+                        [disabled]="startingGame"
+                      >
+                        <span *ngIf="!startingGame">Start Game (Lock & Randomize)</span>
+                        <mat-spinner *ngIf="startingGame" diameter="24" class="inline-spinner"></mat-spinner>
+                      </button>          </div>
         </div>
 
         <div

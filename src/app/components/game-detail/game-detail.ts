@@ -68,6 +68,8 @@ export class GameDetailComponent {
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
 
+  startingGame = false;
+
   gameId$ = this.route.paramMap.pipe(map((params) => params.get('id')!));
 
   // Score Inputs (Model)
@@ -322,11 +324,14 @@ export class GameDetailComponent {
     }
 
     try {
+      this.startingGame = true;
       await this.gameService.startGame(gameId);
       this.snackBar.open('Game Started!', 'Close', { duration: 3000 });
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Unknown error';
       this.snackBar.open('Error: ' + message, 'Close', { duration: 5000 });
+    } finally {
+      this.startingGame = false;
     }
   }
 

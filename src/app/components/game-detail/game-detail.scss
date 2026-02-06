@@ -304,6 +304,15 @@ header {
   }
 }
 
+.inline-spinner {
+  display: inline-block;
+  margin: 0 auto;
+  
+  ::ng-deep circle {
+    stroke: white !important;
+  }
+}
+
 @media (max-width: 600px) {
   header .title-row h1 {
     font-size: 1.5rem;

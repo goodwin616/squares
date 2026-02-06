@@ -129,6 +129,10 @@ export class GameWizardComponent implements OnInit {
     return (payouts.q1 || 0) + (payouts.half || 0) + (payouts.q3 || 0) + (payouts.final || 0);
   }
 
+  getCurrencyFormat(value: number): string {
+    return value % 1 === 0 ? '1.0-0' : '1.2-2';
+  }
+
   ngOnInit() {
     const currentYear = new Date().getFullYear();
     const game = GAMES_SCHEDULE.find((g) => new Date(g.date).getFullYear() === currentYear);

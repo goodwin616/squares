@@ -71,7 +71,9 @@
             @if (won > 0) {
               <div class="stat">
                 <span class="label">Total Won</span>
-                <span class="value win-amount">{{ won | currency: 'USD' : 'symbol' : '1.2-2' }}</span>
+                <span class="value win-amount">{{
+                  won | currency: 'USD' : 'symbol' : '1.2-2'
+                }}</span>
               </div>
             }
           }
@@ -164,7 +166,7 @@
     <br />
     <!-- Admin Controls -->
     @if (isAdmin$ | async) {
-      <mat-expansion-panel class="admin-panel">
+      <mat-expansion-panel class="admin-panel" [expanded]="game.status === 'DRAFT'">
         <mat-expansion-panel-header>
           <mat-panel-title>Admin Controls</mat-panel-title>
         </mat-expansion-panel-header>
@@ -231,16 +233,17 @@
               </mat-select>
             </mat-form-field>
 
-                      <button 
-                        mat-raised-button 
-                        color="accent" 
-                        (click)="startGame(game.id)" 
-                        style="width: 100%"
-                        [disabled]="startingGame"
-                      >
-                        <span *ngIf="!startingGame">Start Game (Lock & Randomize)</span>
-                        <mat-spinner *ngIf="startingGame" diameter="24" class="inline-spinner"></mat-spinner>
-                      </button>          </div>
+            <button
+              mat-raised-button
+              color="accent"
+              (click)="startGame(game.id)"
+              style="width: 100%"
+              [disabled]="startingGame"
+            >
+              <span *ngIf="!startingGame">Start Game (Lock & Randomize)</span>
+              <mat-spinner *ngIf="startingGame" diameter="24" class="inline-spinner"></mat-spinner>
+            </button>
+          </div>
         </div>
 
         <div

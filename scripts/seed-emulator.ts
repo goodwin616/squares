@@ -20,7 +20,7 @@ async function seed() {
   try {
     await auth.getUser(uid);
     console.log('User already exists in Auth.');
-  } catch (e) {
+  } catch {
     console.log('Creating user in Auth...');
     await auth.createUser({
       uid: uid,

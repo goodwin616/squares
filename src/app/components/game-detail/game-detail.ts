@@ -177,6 +177,18 @@ export class GameDetailComponent {
 
   hasUnpaidPlayers$ = this.players$.pipe(map((players) => players.some((p) => !p.allPaid)));
 
+  showAdminControls$ = combineLatest([this.isAdmin$, this.game$, this.hasUnpaidPlayers$]).pipe(
+    map(([isAdmin, game, hasUnpaid]) => {
+      if (!isAdmin || !game) return false;
+      // Show if in draft
+      if (game.status === 'DRAFT') return true;
+      // Show if anyone hasn't paid
+      if (hasUnpaid) return true;
+      // Show if it's a manual game (needs score entry)
+      return !game.big_game_id;
+    }),
+  );
+
   winners$ = combineLatest([this.game$, this.squares$, this.usersMap$]).pipe(
     map(([game, squares, usersMap]) => {
       if (!game) return [];

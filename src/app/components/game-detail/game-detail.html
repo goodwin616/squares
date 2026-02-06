@@ -165,7 +165,7 @@
     </mat-card>
     <br />
     <!-- Admin Controls -->
-    @if (isAdmin$ | async) {
+    @if (showAdminControls$ | async) {
       <mat-expansion-panel class="admin-panel" [expanded]="game.status === 'DRAFT'">
         <mat-expansion-panel-header>
           <mat-panel-title>Admin Controls</mat-panel-title>

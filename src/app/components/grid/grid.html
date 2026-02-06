@@ -1,4 +1,5 @@
-<div class="grid-scroll-wrapper" *ngIf="usersMap$ | async as usersMap">
+@if (usersMap$ | async; as usersMap) {
+<div class="grid-scroll-wrapper">
   <div class="game-grid">
     
     <!-- Top Left Corner (Legend) -->
@@ -85,7 +86,9 @@
           @if (getSquare(r, c); as sq) {
             <div class="square-content">
               <span class="owner-name">{{ getOwnerName(sq, usersMap) | gridName:uniqueNames }}</span>
-              <span *ngIf="game?.config?.rules?.track_payments && !sq.is_paid && sq.owner_id !== game.admin_id && currentUser?.uid === game.admin_id" class="unpaid-badge" title="Payment Pending">$</span>
+              @if (game?.config?.rules?.track_payments && !sq.is_paid && sq.owner_id !== game.admin_id && currentUser?.uid === game.admin_id) {
+                <span class="unpaid-badge" title="Payment Pending">$</span>
+              }
             </div>
           } @else if (game?.status !== 'DRAFT' && isWinner(r, c)) {
             <!-- House Winner State -->
@@ -104,3 +107,4 @@
 
   </div>
 </div>
+}

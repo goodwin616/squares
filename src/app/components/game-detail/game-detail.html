@@ -19,12 +19,14 @@
           </div>
 
           @if (game.status === 'DRAFT') {
-            <div class="progress-section" *ngIf="filledSquaresCount$ | async as filled">
-              <div class="progress-info">
-                <span class="progress-text">{{ 100 - filled }} / 100 squares remaining</span>
+            @if (filledSquaresCount$ | async; as filled) {
+              <div class="progress-section">
+                <div class="progress-info">
+                  <span class="progress-text">{{ 100 - filled }} / 100 squares remaining</span>
+                </div>
+                <mat-progress-bar mode="determinate" [value]="filled"></mat-progress-bar>
               </div>
-              <mat-progress-bar mode="determinate" [value]="filled"></mat-progress-bar>
-            </div>
+            }
           }
 
           <div class="info-row">
@@ -58,46 +60,48 @@
       </div>
     } @else if (user) {
       <mat-card class="dashboard">
-        <mat-card-content *ngIf="myStats$ | async as stats">
-          <div class="stat">
-            <span class="label">My Squares</span>
-            <span class="value">{{ stats.count }}</span>
-          </div>
-          <div class="stat">
-            <span class="label">Total Cost</span>
-            <span class="value">{{ stats.owed | currency: 'USD' : 'symbol' : '1.2-2' }}</span>
-          </div>
-          @if (totalWon$ | async; as won) {
-            @if (won > 0) {
-              <div class="stat">
-                <span class="label">Total Won</span>
-                <span class="value win-amount">{{
-                  won | currency: 'USD' : 'symbol' : '1.2-2'
-                }}</span>
+        @if (myStats$ | async; as stats) {
+          <mat-card-content>
+            <div class="stat">
+              <span class="label">My Squares</span>
+              <span class="value">{{ stats.count }}</span>
+            </div>
+            <div class="stat">
+              <span class="label">Total Cost</span>
+              <span class="value">{{ stats.owed | currency: 'USD' : 'symbol' : '1.2-2' }}</span>
+            </div>
+            @if (totalWon$ | async; as won) {
+              @if (won > 0) {
+                <div class="stat">
+                  <span class="label">Total Won</span>
+                  <span class="value win-amount">{{
+                    won | currency: 'USD' : 'symbol' : '1.2-2'
+                  }}</span>
+                </div>
+              }
+            }
+
+            @if (stats.unpaidAmount > 0 && game.config?.rules?.venmoUsername && !(isAdmin$ | async)) {
+              <div class="pay-button-container">
+                <a
+                  mat-raised-button
+                  class="venmo-button"
+                  [href]="
+                    getVenmoLink(
+                      game.config.rules.venmoUsername,
+                      stats.unpaidAmount,
+                      user.displayName || 'Player'
+                    )
+                  "
+                  target="_blank"
+                >
+                  <mat-icon>payment</mat-icon>
+                  Pay {{ stats.unpaidAmount | currency: 'USD' : 'symbol' : '1.2-2' }} with Venmo
+                </a>
               </div>
             }
-          }
-
-          @if (stats.unpaidAmount > 0 && game.config?.rules?.venmoUsername && !(isAdmin$ | async)) {
-            <div class="pay-button-container">
-              <a
-                mat-raised-button
-                class="venmo-button"
-                [href]="
-                  getVenmoLink(
-                    game.config.rules.venmoUsername,
-                    stats.unpaidAmount,
-                    user.displayName || 'Player'
-                  )
-                "
-                target="_blank"
-              >
-                <mat-icon>payment</mat-icon>
-                Pay {{ stats.unpaidAmount | currency: 'USD' : 'symbol' : '1.2-2' }} with Venmo
-              </a>
-            </div>
-          }
-        </mat-card-content>
+          </mat-card-content>
+        }
       </mat-card>
     } @else {
       <div class="login-prompt">
@@ -172,111 +176,119 @@
         </mat-expansion-panel-header>
 
         <!-- Player Payments (Always available, auto-expanded if unpaid) -->
-        <mat-expansion-panel
-          *ngIf="game.config?.rules?.track_payments"
-          [expanded]="hasUnpaidPlayers$ | async"
-          style="margin-top: 1rem"
-        >
-          <mat-expansion-panel-header>
-            <mat-panel-title>Player Payments</mat-panel-title>
-          </mat-expansion-panel-header>
+        @if (game.config?.rules?.track_payments) {
+          <mat-expansion-panel
+            [expanded]="hasUnpaidPlayers$ | async"
+            style="margin-top: 1rem"
+          >
+            <mat-expansion-panel-header>
+              <mat-panel-title>Player Payments</mat-panel-title>
+            </mat-expansion-panel-header>
 
-          <mat-list role="list">
-            <mat-list-item role="listitem" *ngFor="let player of players$ | async">
-              <span matListItemTitle>{{ player.name }}</span>
-              <span matListItemLine
-                >{{ player.squaresCount }} squares - owed
-                {{ player.owed | currency: 'USD' : 'symbol' : '1.2-2' }}</span
-              >
-              <mat-checkbox
-                *ngIf="player.uid !== game.admin_id"
-                [checked]="player.allPaid"
-                (change)="togglePlayerPaid(game.id, player, $event.checked)"
-                matListItemMeta
-              >
-                Paid
-              </mat-checkbox>
-              <span *ngIf="player.uid === game.admin_id" matListItemMeta class="status-badge ADMIN"
-                >ADMIN</span
-              >
-            </mat-list-item>
-            <p *ngIf="(players$ | async)?.length === 0" style="padding: 1rem">No players yet.</p>
-          </mat-list>
-        </mat-expansion-panel>
+            <mat-list role="list">
+                          <mat-list-item role="listitem" *ngFor="let player of players$ | async">
+                            <span matListItemTitle>{{ player.name }}</span>
+                            <span matListItemLine
+                              >{{ player.squaresCount }} squares - owed
+                              {{ player.owed | currency: 'USD' : 'symbol' : '1.2-2' }}</span
+                            >
+                            @if (player.uid !== game.admin_id) {
+                              <mat-checkbox
+                                [checked]="player.allPaid"
+                                (change)="togglePlayerPaid(game.id, player, $event.checked)"
+                                matListItemMeta
+                              >
+                                Paid
+                              </mat-checkbox>
+                            }
+                            @if (player.uid === game.admin_id) {
+                              <span matListItemMeta class="status-badge ADMIN">ADMIN</span>
+                            }
+                          </mat-list-item>
+                          @if ((players$ | async)?.length === 0) {
+                            <p style="padding: 1rem">No players yet.</p>
+                          }            </mat-list>
+          </mat-expansion-panel>
+        }
 
-        <div
-          *ngIf="game.status === 'DRAFT'"
-          class="action-row"
-          style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem"
-        >
-          <div class="start-game-section">
-            <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 1rem">
-              <mat-label>Max Squares per Player</mat-label>
-              <input
-                matInput
-                type="number"
-                [value]="game.config.rules.max_squares || ''"
-                (change)="updateMaxSquares(game, $any($event.target).value)"
-                placeholder="Unlimited"
-              />
-              <mat-hint>Leave empty or 0 for unlimited</mat-hint>
-            </mat-form-field>
+        @if (game.status === 'DRAFT') {
+          <div
+            class="action-row"
+            style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem"
+          >
+            <div class="start-game-section">
+              <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 1rem">
+                <mat-label>Max Squares per Player</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [value]="game.config.rules.max_squares || ''"
+                  (change)="updateMaxSquares(game, $any($event.target).value)"
+                  placeholder="Unlimited"
+                />
+                <mat-hint>Leave empty or 0 for unlimited</mat-hint>
+              </mat-form-field>
 
-            <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 1rem">
-              <mat-label>Unclaimed Squares Rule</mat-label>
-              <mat-select
-                [value]="game.config.rules.unclaimed_rule"
-                (selectionChange)="updateUnclaimedRule(game, $event.value)"
+              <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 1rem">
+                <mat-label>Unclaimed Squares Rule</mat-label>
+                <mat-select
+                  [value]="game.config.rules.unclaimed_rule"
+                  (selectionChange)="updateUnclaimedRule(game, $event.value)"
+                >
+                  <mat-option value="REQUIRE_FULL">Require Full Grid to Start</mat-option>
+                  <mat-option value="RETURN_TO_POOL">Rollover to Next Pot (House Squares)</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <button
+                mat-raised-button
+                color="accent"
+                (click)="startGame(game.id)"
+                style="width: 100%"
+                [disabled]="startingGame"
               >
-                <mat-option value="REQUIRE_FULL">Require Full Grid to Start</mat-option>
-                <mat-option value="RETURN_TO_POOL">Rollover to Next Pot (House Squares)</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <button
-              mat-raised-button
-              color="accent"
-              (click)="startGame(game.id)"
-              style="width: 100%"
-              [disabled]="startingGame"
-            >
-              <span *ngIf="!startingGame">Start Game (Lock & Randomize)</span>
-              <mat-spinner *ngIf="startingGame" diameter="24" class="inline-spinner"></mat-spinner>
-            </button>
+                @if (!startingGame) {
+                  <span>Start Game (Lock & Randomize)</span>
+                } @else {
+                  <mat-spinner diameter="24" class="inline-spinner"></mat-spinner>
+                }
+              </button>
+            </div>
           </div>
-        </div>
+        }
 
-        <div
-          *ngIf="game.status !== 'DRAFT' && !game.big_game_id"
-          class="score-entry"
-          style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem"
-        >
-          <h3>Update Scores</h3>
+        @if (game.status !== 'DRAFT' && !game.big_game_id) {
+          <div
+            class="score-entry"
+            style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem"
+          >
+            <h3>Update Scores</h3>
 
-          <div class="score-row" *ngFor="let q of ['q1', 'half', 'q3', 'final']">
-            <span class="q-label">{{ q | uppercase }}</span>
-            <mat-form-field class="score-input">
-              <mat-label>Away: {{ game.config?.teams?.away }}</mat-label>
-              <input
-                matInput
-                type="number"
-                [(ngModel)]="scoreInputs[q].away"
-                (ngModelChange)="onScoreEdit()"
-              />
-            </mat-form-field>
-            <mat-form-field class="score-input">
-              <mat-label>Home: {{ game.config?.teams?.home }}</mat-label>
-              <input
-                matInput
-                type="number"
-                [(ngModel)]="scoreInputs[q].home"
-                (ngModelChange)="onScoreEdit()"
-              />
-            </mat-form-field>
+            <div class="score-row" *ngFor="let q of ['q1', 'half', 'q3', 'final']">
+              <span class="q-label">{{ q | uppercase }}</span>
+              <mat-form-field class="score-input">
+                <mat-label>Away: {{ game.config?.teams?.away }}</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="scoreInputs[q].away"
+                  (ngModelChange)="onScoreEdit()"
+                />
+              </mat-form-field>
+              <mat-form-field class="score-input">
+                <mat-label>Home: {{ game.config?.teams?.home }}</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="scoreInputs[q].home"
+                  (ngModelChange)="onScoreEdit()"
+                />
+              </mat-form-field>
+            </div>
+
+            <button mat-raised-button color="primary" (click)="saveScores(game)">Save Scores</button>
           </div>
-
-          <button mat-raised-button color="primary" (click)="saveScores(game)">Save Scores</button>
-        </div>
+        }
       </mat-expansion-panel>
     }
   </div>

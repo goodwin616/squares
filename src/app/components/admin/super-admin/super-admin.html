@@ -10,49 +10,49 @@
         </mat-form-field>
       </div>
 
-      <ng-container *ngIf="scores$ | async"></ng-container>
+      @if (scores$ | async) {}
 
-      <div *ngIf="loaded; else loading" class="admin-panel-content">
-        @let config = (gameConfig$ | async);
-        <h3>
-          Scores for {{ year$ | async }} 
-          @if (config) {
-            <small>({{ config.awayTeam }} @ {{ config.homeTeam }})</small>
-          }
-        </h3>
-        
-        <div class="score-entry">
-          <div class="score-row" *ngFor="let q of ['q1', 'half', 'q3', 'final']">
-            <span class="q-label">{{ q | uppercase }}</span>
-            <mat-form-field class="score-input" appearance="outline">
-              <mat-label>Away: {{ config?.awayTeam || 'Away' }}</mat-label>
-              <input
-                matInput
-                type="number"
-                [(ngModel)]="scores[q].away"
-              />
-            </mat-form-field>
-            <mat-form-field class="score-input" appearance="outline">
-              <mat-label>Home: {{ config?.homeTeam || 'Home' }}</mat-label>
-              <input
-                matInput
-                type="number"
-                [(ngModel)]="scores[q].home"
-              />
-            </mat-form-field>
+      @if (loaded) {
+        <div class="admin-panel-content">
+          @let config = (gameConfig$ | async);
+          <h3>
+            Scores for {{ year$ | async }} 
+            @if (config) {
+              <small>({{ config.awayTeam }} @ {{ config.homeTeam }})</small>
+            }
+          </h3>
+          
+          <div class="score-entry">
+            <div class="score-row" *ngFor="let q of ['q1', 'half', 'q3', 'final']">
+              <span class="q-label">{{ q | uppercase }}</span>
+              <mat-form-field class="score-input" appearance="outline">
+                <mat-label>Away: {{ config?.awayTeam || 'Away' }}</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="scores[q].away"
+                />
+              </mat-form-field>
+              <mat-form-field class="score-input" appearance="outline">
+                <mat-label>Home: {{ config?.homeTeam || 'Home' }}</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="scores[q].home"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button mat-raised-button color="primary" (click)="saveScores()">Save Global Scores</button>
           </div>
         </div>
-
-        <div class="actions">
-          <button mat-raised-button color="primary" (click)="saveScores()">Save Global Scores</button>
-        </div>
-      </div>
-
-      <ng-template #loading>
+      } @else {
         <div class="loading-container">
           <p>Loading global scores...</p>
         </div>
-      </ng-template>
+      }
 
     </mat-card-content>
   </mat-card>

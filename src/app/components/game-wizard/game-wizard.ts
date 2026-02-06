@@ -93,6 +93,7 @@ export class GameWizardComponent implements OnInit {
   gameForm: FormGroup = this.fb.group({
     name: ['', Validators.required],
     price: [1, [Validators.required, Validators.min(0)]],
+    big_game_id: [new Date().getFullYear().toString()],
     teams: this.fb.group({
       home: ['', Validators.required],
       homeColor: [''],
@@ -190,6 +191,7 @@ export class GameWizardComponent implements OnInit {
         admin_id: user.uid,
         name: formValue.name,
         status: 'DRAFT',
+        big_game_id: formValue.big_game_id,
         config: {
           price: formValue.price,
           payouts: payoutsData,

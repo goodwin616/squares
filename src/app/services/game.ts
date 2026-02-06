@@ -62,6 +62,7 @@ export interface Game {
   };
   scores?: GameScores;
   config?: GameConfigData;
+  big_game_id?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -102,7 +103,7 @@ export class GameService {
   getOwnedGames(userId: string): Observable<Game[]> {
     const gamesCol = collection(this.firestore, 'games');
     const q = query(gamesCol, where('admin_id', '==', userId));
-    return new Observable((observer) => {
+    return new Observable<Game[]>((observer) => {
       const unsubscribe = onSnapshot(
         q,
         (snap) => {
@@ -147,7 +148,7 @@ export class GameService {
 
   getGame(gameId: string): Observable<Game | null> {
     const gameDoc = doc(this.firestore, `games/${gameId}`);
-    return new Observable((observer) => {
+    return new Observable<Game | null>((observer) => {
       const unsubscribe = onSnapshot(
         gameDoc,
         (snap) => {
@@ -160,6 +161,41 @@ export class GameService {
         (error) => {
           observer.error(error);
         },
+      );
+      return () => unsubscribe();
+    }).pipe(
+      switchMap((game) => {
+        if (!game || !game.big_game_id) {
+          return of(game);
+        }
+        return this.getGlobalScores(game.big_game_id).pipe(
+          map((scores) => {
+            if (scores) {
+              return { ...game, scores };
+            }
+            return game;
+          })
+        );
+      })
+    );
+  }
+
+  getGlobalScores(year: string): Observable<GameScores | null> {
+    const scoresDoc = doc(this.firestore, `scores/${year}`);
+    return new Observable<GameScores | null>((observer) => {
+      const unsubscribe = onSnapshot(
+        scoresDoc,
+        (snap) => {
+          if (snap.exists()) {
+            observer.next(snap.data() as GameScores);
+          } else {
+            observer.next(null);
+          }
+        },
+        (error) => {
+          console.error(`Error fetching global scores for ${year}:`, error);
+          observer.next(null); // Emit null on error so the stream doesn't hang
+        }
       );
       return () => unsubscribe();
     });
@@ -247,5 +283,28 @@ export class GameService {
   async updateGameConfig(gameId: string, config: GameConfigData) {
     const gameDoc = doc(this.firestore, `games/${gameId}`);
     await updateDoc(gameDoc, { config });
+  }
+
+  // --- Super Admin ---
+  async saveGlobalScores(year: string, scores: GameScores) {
+    const scoresDoc = doc(this.firestore, `scores/${year}`);
+    await setDoc(scoresDoc, scores, { merge: true });
+  }
+
+  isSuperAdmin(uid: string): Observable<boolean> {
+    const adminDoc = doc(this.firestore, `super_admins/${uid}`);
+    return new Observable<boolean>((observer) => {
+      const unsubscribe = onSnapshot(
+        adminDoc,
+        (snap) => {
+          observer.next(snap.exists());
+        },
+        (error) => {
+          console.error('Error checking super admin status', error);
+          observer.next(false);
+        }
+      );
+      return () => unsubscribe();
+    });
   }
 }

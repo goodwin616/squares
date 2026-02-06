@@ -12,12 +12,28 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
     
+    function isSuperAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/super_admins/$(request.auth.uid));
+    }
+    
     // Fetch the parent game document to check status or admin rights
     function getGameData(gameId) {
       return get(/databases/$(database)/documents/games/$(gameId)).data;
     }
 
     // --- Collection Rules ---
+
+    // Global Scores
+    match /scores/{year} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    // Super Admins
+    match /super_admins/{userId} {
+      allow read: if isCurrentUser(userId);
+      allow write: if false; // Managed manually in console
+    }
 
     // Collection Group Query for Squares
     match /{path=**}/squares/{squareId} {

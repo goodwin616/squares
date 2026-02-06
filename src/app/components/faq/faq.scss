@@ -1,0 +1,29 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+h1 {
+  margin-bottom: 24px;
+  font-weight: 700;
+}
+
+mat-card {
+  padding: 16px;
+}
+
+mat-expansion-panel {
+  margin-bottom: 8px;
+  
+  mat-panel-title {
+    font-size: 1.1rem;
+  }
+  
+  p {
+    color: #444;
+    line-height: 1.6;
+    margin: 16px 0;
+    white-space: pre-line;
+  }
+}

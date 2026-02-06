@@ -31,3 +31,23 @@
 <main class="content-container">
   <router-outlet></router-outlet>
 </main>
+
+<footer class="app-footer">
+  <div class="footer-content">
+    <div class="footer-links">
+      <a routerLink="/faq">FAQ</a>
+      <a href="https://github.com/goodwin616/squares" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <div class="footer-copy">
+      &copy; {{ currentYear }} Squares. Built with &hearts;
+    </div>
+  </div>
+  <div class="footer-legal">
+    <strong>LEGAL NOTICE</strong>
+    <p>
+      Squares is a scorekeeping and hosting tool for entertainment only. We do not facilitate online gambling. 
+      Users are strictly prohibited from using this platform in violation of any local, state, or federal laws. 
+      The responsibility for legal compliance rests solely with the user.
+    </p>
+  </div>
+</footer>

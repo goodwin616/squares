@@ -28,6 +28,7 @@ export class App {
   private authService = inject(AuthService);
   private gameService = inject(GameService);
   protected readonly title = signal('Squares');
+  protected readonly currentYear = new Date().getFullYear();
 
   user$ = this.authService.user$;
 

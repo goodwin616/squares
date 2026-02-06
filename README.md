@@ -1,5 +1,7 @@
 # Squares
 
+![Squares Gameplay Screenshot](public/screenshot.png)
+
 A web application for managing Super Bowl squares games. Built with Angular and Firebase, it simplifies the process of creating games, inviting friends, tracking payments, and viewing live results.
 
 ## Features

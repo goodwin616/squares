@@ -174,9 +174,9 @@ export class GameService {
               return { ...game, scores };
             }
             return game;
-          })
+          }),
         );
-      })
+      }),
     );
   }
 
@@ -195,7 +195,7 @@ export class GameService {
         (error) => {
           console.error(`Error fetching global scores for ${year}:`, error);
           observer.next(null); // Emit null on error so the stream doesn't hang
-        }
+        },
       );
       return () => unsubscribe();
     });
@@ -302,7 +302,7 @@ export class GameService {
         (error) => {
           console.error('Error checking super admin status', error);
           observer.next(false);
-        }
+        },
       );
       return () => unsubscribe();
     });

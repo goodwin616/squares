@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { switchMap, map, combineLatest, of, tap, firstValueFrom, Observable } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
@@ -42,6 +42,7 @@ interface PlayerStats {
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     FormsModule,
     MatCardModule,
     MatButtonModule,

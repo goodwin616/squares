@@ -264,6 +264,46 @@ header {
   padding: 48px;
 }
 
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-top: 48px;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #f44336;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 24px;
+    max-width: 400px;
+  }
+
+  button {
+    padding: 0 32px;
+    height: 48px;
+    border-radius: 24px;
+    font-weight: 600;
+  }
+}
+
 @media (max-width: 600px) {
   header .title-row h1 {
     font-size: 1.5rem;

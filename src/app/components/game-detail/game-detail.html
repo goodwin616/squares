@@ -1,4 +1,4 @@
-<div class="container" *ngIf="game$ | async as game">
+<div class="container" *ngIf="game$ | async as game; else notFound">
   <!-- Header -->
   <header>
     <div class="header-main">
@@ -231,7 +231,7 @@
       </div>
 
       <div
-        *ngIf="game.status !== 'DRAFT'"
+        *ngIf="game.status !== 'DRAFT' && !game.big_game_id"
         class="score-entry"
         style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem"
       >
@@ -264,3 +264,12 @@
     </mat-expansion-panel>
   }
 </div>
+
+<ng-template #notFound>
+  <div class="not-found-container">
+    <mat-icon>error_outline</mat-icon>
+    <h2>Game Not Found</h2>
+    <p>The game ID you are looking for does not exist or has been deleted.</p>
+    <button mat-raised-button color="primary" routerLink="/">Return to Dashboard</button>
+  </div>
+</ng-template>
